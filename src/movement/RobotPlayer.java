@@ -1,20 +1,21 @@
 package movement;
-import battlecode.common.*;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import battlecode.common.*;
+
+import java.util.*;
 
 public class RobotPlayer {
     static RobotController rc;
+    
+    static double tan_Pi_div_8= Math.sqrt(2.0) - 1.0;
 
     static final RobotType[] spawnableRobot = {
             RobotType.POLITICIAN,
             RobotType.SLANDERER,
             RobotType.MUCKRAKER,
     };
+
+    static int age = 0;
 
     static final Direction[] directions = {
             Direction.NORTH,
@@ -46,6 +47,7 @@ public class RobotPlayer {
                 System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
             }
+            age++;
             Clock.yield();
         }
     }
@@ -67,12 +69,12 @@ public class RobotPlayer {
                 }
             }
         }
-        Move(directions);
+        Move();
 
     }
 
     private static void runSlanderer() throws GameActionException {
-        Move(directions);
+        Move();
     }
 
     private static void runPolitician() throws GameActionException {
@@ -90,7 +92,7 @@ public class RobotPlayer {
             return;
         }
 
-        Move(directions);
+        Move();
 
     }
 
@@ -117,25 +119,6 @@ public class RobotPlayer {
         return directions[(int) (Math.random() * directions.length)];
     }
 
-    static Direction fromLoc(MapLocation m1, MapLocation m2){
-
-        double angle = Math.atan2(m2.y-m1.y,m2.x-m1.x); //find the angle of the vector btn the points
-        angle += Math.PI;
-        angle /= Math.PI/4;
-        int halfQ = (int) angle;
-        halfQ %= 8;
-        switch(halfQ){
-            case 1: return Direction.NORTHWEST;
-            case 2: return Direction.WEST;
-            case 3: return Direction.SOUTHWEST;
-            case 4: return Direction.SOUTH;
-            case 5: return Direction.SOUTHEAST;
-            case 6: return Direction.EAST;
-            case 7: return Direction.NORTHEAST;
-            default: return Direction.NORTH; //case 0
-        }
-    }
-
     //rnd bottype
     static RobotType randomSpawnableRobotType() {
         return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
@@ -143,16 +126,157 @@ public class RobotPlayer {
 
     //gets the easiest path to traverse
 
-    static void Move(Direction[] tries) throws GameActionException {
-        if(rc.getCooldownTurns() < 1 && rc.isReady()){
-            int rnd = (int) (Math.random() * tries.length);
-            if(!tryMove(tries[rnd])){
-                tries = ArrayUtils.remove(tries, Arrays.asList(tries).indexOf(tries[rnd]));
-                Move(tries);
+    static void Move() throws GameActionException {
+        if(age > 50){
+            RobotInfo[] nearby = rc.senseNearbyRobots();
+            int[] dirWeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0}; //Order: N , E , S , W , NW , NE , SE , SW
+
+
+            for(RobotInfo r : nearby){
+                if(r.getTeam().equals(rc.getTeam())){
+                    Direction d = GetDirection(rc.getLocation(),r.getLocation());
+                    System.out.println("Bot found at " +d.toString());
+                    switch(d){
+                        case NORTH:{
+                            dirWeights[2]++;
+                            dirWeights[6]++;
+                            dirWeights[7]++;
+                        }
+                        case EAST:{
+                            dirWeights[3]++;
+                            dirWeights[4]++;
+                            dirWeights[7]++;
+                        }
+                        case SOUTH:{
+                            dirWeights[0]++;
+                            dirWeights[4]++;
+                            dirWeights[5]++;
+                        }
+                        case WEST:{
+                            dirWeights[1]++;
+                            dirWeights[5]++;
+                            dirWeights[6]++;
+                        }
+                        case NORTHWEST:{
+                            dirWeights[1]++;
+                            dirWeights[2]++;
+                            dirWeights[6]++;
+                        }
+                        case NORTHEAST:{
+                            dirWeights[2]++;
+                            dirWeights[3]++;
+                            dirWeights[7]++;
+                        }
+                        case SOUTHEAST:{
+                            dirWeights[0]++;
+                            dirWeights[3]++;
+                            dirWeights[4]++;
+                        }
+                        case SOUTHWEST:{
+                            dirWeights[0]++;
+                            dirWeights[1]++;
+                            dirWeights[5]++;
+                        }
+                        default: dirWeights[0]++;
+                    }
+                }
             }
-        }else return;
+            Map<Direction,Integer> aDir = new TreeMap<Direction,Integer>();
+/*
+            aDir.put(Direction.NORTH,dirWeights[0]);
+            aDir.put(Direction.EAST,dirWeights[1]);
+            aDir.put(Direction.SOUTH,dirWeights[2]);
+            aDir.put(Direction.WEST,dirWeights[3]);
+            aDir.put(Direction.NORTHWEST,dirWeights[4]);
+            aDir.put(Direction.NORTHEAST,dirWeights[5]);
+            aDir.put(Direction.SOUTHEAST,dirWeights[6]);
+            aDir.put(Direction.SOUTHWEST,dirWeights[7]);
+ */
+
+            aDir.put(Direction.SOUTH,dirWeights[0]);
+            aDir.put(Direction.WEST,dirWeights[1]);
+            aDir.put(Direction.NORTH,dirWeights[2]);
+            aDir.put(Direction.EAST,dirWeights[3]);
+            aDir.put(Direction.SOUTHEAST,dirWeights[4]);
+            aDir.put(Direction.SOUTHWEST,dirWeights[5]);
+            aDir.put(Direction.NORTHWEST,dirWeights[6]);
+            aDir.put(Direction.NORTHEAST,dirWeights[7]);
+
+            SortedSet<Map.Entry<Direction, Integer>> uDir = entriesSortedByValues(aDir);
+            for(Map.Entry<Direction,Integer> e : uDir){
+                if(tryMove(e.getKey())){
+                    System.out.println(rc.getType() +" moved " +e.getKey() +" because it had a value of " +e.getValue());
+                }
+            }
+            return;
+        }else{
+            while(true){
+                if(tryMove(randomDirection())) return;
+            }
+        }
+    }
+    static <K,V extends Comparable<? super V>> SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+        SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
+                new Comparator<Map.Entry<K,V>>() {
+                    @Override public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
+                        int res = e1.getValue().compareTo(e2.getValue());
+                        return res != 0 ? res : 1;
+                    }
+                }
+        );
+        sortedEntries.addAll(map.entrySet());
+        return sortedEntries;
     }
 
+    static Direction GetDirection(MapLocation start, MapLocation end)
+    {
+
+        double dx = end.x - start.x;
+        double dy = end.y - start.y;
+
+
+        if (Math.abs(dx) > Math.abs(dy))
+        {
+            if (Math.abs(dy / dx) <= tan_Pi_div_8)
+            {
+                return dx > 0 ? Direction.EAST : Direction.WEST;
+            }
+
+            else if (dx > 0)
+            {
+                return dy > 0 ? Direction.NORTHEAST : Direction.SOUTHEAST;
+            }
+            else
+            {
+                return dy > 0 ? Direction.NORTHWEST : Direction.SOUTHWEST;
+            }
+        }
+
+        else if (Math.abs(dy) > 0)
+        {
+            if (Math.abs(dx / dy) <= tan_Pi_div_8)
+            {
+                return dy > 0 ? Direction.NORTH : Direction.SOUTH;
+            }
+            else if (dy > 0)
+            {
+                return dx > 0 ? Direction.NORTHEAST : Direction.NORTHWEST;
+            }
+            else
+            {
+                return dx > 0 ? Direction.SOUTHEAST : Direction.SOUTHWEST;
+            }
+        }
+        else
+        {
+            System.out.println("No direction found");
+            return Direction.NORTH;
+        }
+
+
+    }
+
+    
     //attempts to move, true if success.
     static boolean tryMove(Direction dir) throws GameActionException {
         if (rc.canMove(dir)) {
