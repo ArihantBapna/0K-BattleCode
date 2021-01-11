@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 public strictfp class RobotPlayer {
@@ -51,6 +52,19 @@ public strictfp class RobotPlayer {
 
     static ArrayList<Integer> robotId = new ArrayList<>();
 
+
+    static boolean mapped = false;
+
+    static int south = 0;
+    static int north = 0;
+    static int west = 0;
+    static int east = 0;
+
+    static int x = 0;
+    static int y = 0;
+
+    static MapLocation realLoc;
+
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
@@ -66,7 +80,12 @@ public strictfp class RobotPlayer {
 
         current = randomDirection();
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        if(rc.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
+            //Its an ec
+        }else{
+            SetMappingBot();
+        }
+
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
@@ -102,15 +121,96 @@ public strictfp class RobotPlayer {
                 robotId.add(id);
             }
         }
-        for(int i : robotId){
-            try{
+        if(!mapped){
+            if(south != 0 || north != 0){
+                if(east != 0 || west != 0){
+                    //You have adjusted the map coordinates
+                    mapped = true;
+                }else{
+                    StoreMapEc();
+                }
+            }else StoreMapEc();
+        }else{
+            StoreEcFlag();
+        }
+    }
+
+    static void SetMappingBot() throws GameActionException{
+        for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam())){
+            if(r.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
+                Direction d = r.getLocation().directionTo(rc.getLocation());
+                realLoc = new MapLocation(64,64).add(d);
+                RobotPlayer.x = realLoc.x;
+                RobotPlayer.y = realLoc.y;
+            }
+        }
+        UpdateBotFlag();
+    }
+
+    static void UpdateBotFlag() throws GameActionException{
+        String flag = MakeECFlag(realLoc.x,realLoc.y,"98");
+        rc.setFlag(Integer.parseInt(flag));
+    }
+
+    static void StoreEcFlag() throws GameActionException{
+        if(rc.getFlag(rc.getID()) == 0){
+            String flag = "99";
+            int x = 0;
+            int y = 0;
+            if(south != 0){
+                if(west != 0){
+                    x = rc.getLocation().x - west;
+                }else{
+                    x = east - rc.getLocation().x;
+                }
+                y = rc.getLocation().y - south;
+            }else{
+                if(west != 0){
+                    x = rc.getLocation().x - west;
+                }else{
+                    x = east - rc.getLocation().x;
+                }
+                y = north - rc.getLocation().y;
+            }
+
+            flag = MakeECFlag(x,y,flag);
+
+            RobotPlayer.x = x;
+            RobotPlayer.y = y;
+            rc.setFlag(Integer.parseInt(flag));
+        }
+    }
+
+    static void StoreMapEc() throws GameActionException{
+        Iterator<Integer> rit = robotId.iterator();
+        while(rit.hasNext()){
+            Integer i = rit.next();
+            if(rc.canGetFlag(i)){
                 int flag = rc.getFlag(i);
                 String fl = String.valueOf(flag);
-                if(fl.substring(0,2).equals("11")){
-                    System.out.println("YES! SOMEONE FOUND THE SOUTH POLE " +fl.substring(2,fl.length()));
+
+                if(fl.length() >= 2){
+
+                    int var = Integer.parseInt(fl.substring(2));
+
+                    switch (fl.substring(0, 2)) {
+                        case "11":
+                            south = var;
+                            break;
+                        case "21":
+                            north = var;
+                            break;
+                        case "31":
+                            east = var;
+                            break;
+                        case "41":
+                            west = var;
+                        default:
+                            break;
+                    }
                 }
-            }catch(GameActionException e){
-                System.out.println("Robot " +i +" has died");
+            }else{
+                rit.remove();
             }
         }
     }
@@ -175,8 +275,21 @@ public strictfp class RobotPlayer {
         for(int i=0;i<8;i++){
             if(!rc.canMove(current)) {
                 if(!rc.onTheMap(rc.getLocation().add(current))){
-                    if(current.equals(Direction.SOUTH)){
-                        rc.setFlag(WriteDirFlag(Direction.SOUTH));
+                    if(rc.getFlag(rc.getID()) <= 1){
+                        switch (current) {
+                            case SOUTH:
+                                rc.setFlag(WriteDirFlag(Direction.SOUTH));
+                                break;
+                            case NORTH:
+                                rc.setFlag(WriteDirFlag(Direction.NORTH));
+                                break;
+                            case EAST:
+                                rc.setFlag(WriteDirFlag(Direction.EAST));
+                                break;
+                            case WEST:
+                                rc.setFlag(WriteDirFlag(Direction.WEST));
+                                break;
+                        }
                     }
                     current = current.opposite();
                     current = current.rotateRight();
@@ -188,6 +301,8 @@ public strictfp class RobotPlayer {
             }
             else{
                 rc.move(current);
+                realLoc = realLoc.add(current);
+                UpdateBotFlag();
                 return;
             }
         }
@@ -228,13 +343,27 @@ public strictfp class RobotPlayer {
         return Integer.parseInt(flag);
     }
     static int WriteDirFlag(Direction dir){
-        if(dir.equals(Direction.SOUTH)){
-            int y = rc.getLocation().y;
-            String flag = "11" + String.valueOf(y);
-            return Integer.parseInt(flag);
-        }else{
-            return 1;
+        switch (dir) {
+            case SOUTH: {
+                int y = rc.getLocation().y;
+                String flag = "11" + String.valueOf(y);
+                return Integer.parseInt(flag);
+            }
+            case NORTH: {
+                String flag = "21" + String.valueOf(rc.getLocation().y);
+                return Integer.parseInt(flag);
+            }
+            case EAST: {
+                String flag = "31" + String.valueOf(rc.getLocation().x);
+                return Integer.parseInt(flag);
+
+            }
+            case WEST: {
+                String flag = "41" + String.valueOf(rc.getLocation().x);
+                return Integer.parseInt(flag);
+            }
         }
+        return 1;
     }
 
     static MapLocation ReadFlag(int flag){
@@ -260,6 +389,23 @@ public strictfp class RobotPlayer {
 
     }
 
+    static String MakeECFlag(int x, int y, String flag){
+        if(String.valueOf(x).length() <= 1){
+            if(String.valueOf(y).length() <= 1){
+                flag += "0" + String.valueOf(x) + "0" + String.valueOf(y);
+            }else{
+                flag += "0" + String.valueOf(x) + String.valueOf(y);
+            }
+        }else{
+            if(String.valueOf(y).length() <= 1){
+                flag += String.valueOf(x) + "0" + String.valueOf(y);
+            }else{
+                flag += String.valueOf(x) + String.valueOf(y);
+            }
+        }
+        return flag;
+    }
+
     /**
      * Attempts to move in a given direction.
      *
@@ -271,7 +417,10 @@ public strictfp class RobotPlayer {
         System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
         if (rc.canMove(dir)) {
             rc.move(dir);
+            realLoc = realLoc.add(current);
+            UpdateBotFlag();
             return true;
         } else return false;
     }
 }
+
