@@ -1,10 +1,7 @@
 package OkBoomer;
 
 import battlecode.common.*;
-import com.sun.tools.internal.jxc.ap.Const;
-import com.sun.tools.javac.comp.Check;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class Movement {
@@ -85,7 +82,7 @@ public class Movement {
 
     private void AttackMove() throws GameActionException {
         if(!ecSurrounded()){
-            if(!isNextTo()){
+            if(isNotNextTo()){
                 current = adjLoc.directionTo(goal);
                 if(!rc.canMove(current)){
                     for(int i=0;i<8;i++){
@@ -107,7 +104,7 @@ public class Movement {
             }
 
         }else{
-            if(!isNextTo()){
+            if(isNotNextTo()){
                 mode = 0;
             }else{
                 mode = 2;
@@ -136,8 +133,8 @@ public class Movement {
             return surround;
     }
 
-    private boolean isNextTo() throws GameActionException{
-        return adjLoc.isAdjacentTo(goal);
+    private boolean isNotNextTo() throws GameActionException{
+        return !adjLoc.isAdjacentTo(goal);
     }
 
     private void SearchMove() throws GameActionException {
@@ -164,7 +161,6 @@ public class Movement {
             moved = true;
         }
         if(moved){
-            moved = true;
             rc.move(current);
             UpdateAdjLoc();
         }

@@ -1,4 +1,4 @@
-package OkBoomer;
+package OkTomber;
 
 import battlecode.common.*;
 
@@ -66,7 +66,7 @@ public class ECenter {
             }
         }
 
-        if(rc.getRoundNum() > 200){
+        if(rc.getRoundNum() < 200){
             if(rc.canBid((int) (rc.getInfluence()*0.2))){
                 rc.bid((int) (rc.getInfluence()*0.2));
             }
@@ -83,11 +83,10 @@ public class ECenter {
     private RobotType GetRandomRobot(){
         return getRobotType(robType, probDist);
     }
-
     private RobotType getRobotType(List<RobotType> robType, List<Double> probDist) {
         double p = Math.random();
         double total = 0.0d;
-        TreeMap<Double, RobotType>  map = new TreeMap<>();
+        TreeMap<Double, RobotType> map = new TreeMap<>();
         for (int i = 0; i < robType.size(); i++) {
             map.put(total += probDist.get(i), robType.get(i));
         }
