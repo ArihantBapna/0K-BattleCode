@@ -5,12 +5,11 @@ import battlecode.common.*;
 public class Sland {
     RobotController rc;
 
-    public int idEC = 0;
     public Movement mover;
 
     public Sland(RobotController rc) throws GameActionException {
         this.rc = rc;
-        mover = new Movement(rc, idEC);
+        mover = new Movement(rc);
     }
 
     public void doRun() throws GameActionException {

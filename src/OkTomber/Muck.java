@@ -4,15 +4,12 @@ import battlecode.common.*;
 
 public class Muck {
     RobotController rc;
-    private RobotInfo rEC;
 
-    public int idEC = 0;
-    public MapLocation adjLoc;
     public Movement mover;
 
     public Muck(RobotController rc) throws GameActionException {
         this.rc = rc;
-        mover = new Movement(rc,idEC);
+        mover = new Movement(rc);
     }
 
     public void doRun() throws GameActionException {

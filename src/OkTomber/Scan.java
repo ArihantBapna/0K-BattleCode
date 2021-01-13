@@ -15,18 +15,29 @@ public class Scan {
 
     public int SearchForEC() throws GameActionException{
         int c = 2;
-        MapLocation adj = Constants.AdjustLocation(rc.getLocation());
         for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam().opponent())){
             if(r.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
                 MapLocation rLoc = r.getLocation();
+                if(rc.getLocation().isAdjacentTo(rLoc)){
+                    return 1;
+                }
                 c = ScannedEC(rLoc);
                 if(c < 2){
-                    goal = Constants.AdjustLocation(rLoc);
+                    goal = rLoc;
                 }
             }
         }
 
         return c;
+    }
+
+    public int GetECid() throws GameActionException{
+        for(RobotInfo r : rc.senseNearbyRobots(2,rc.getTeam())){
+            if(r.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
+                return r.getID();
+            }
+        }
+        return 0;
     }
 
     public int ScannedEC(MapLocation rLoc) throws GameActionException{
@@ -47,7 +58,7 @@ public class Scan {
                 }
             }
         }
-        return 2;
+        return 3;
     }
 
 }
