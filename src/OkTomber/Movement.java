@@ -3,10 +3,10 @@ package OkTomber;
 import battlecode.common.*;
 
 public class Movement {
-    private RobotController rc;
-    private int mode;
-    private boolean moved;
-    private int EC;
+    public RobotController rc;
+    public int mode;
+    public boolean moved;
+    public int EC;
 
     public Direction current;
     public MapLocation goal;
@@ -29,7 +29,7 @@ public class Movement {
         RunScan();
     }
 
-    private void RunScan() throws GameActionException {
+    public void RunScan() throws GameActionException {
         int c = sc.SearchForEC();
         int cd = sc.cd;
         if(c>=2){
@@ -54,44 +54,44 @@ public class Movement {
     }
 
 
-    private void DoInitialSetup() throws GameActionException {
+    public void DoInitialSetup() throws GameActionException {
         EC = sc.GetECid();
         UpdateAdjLoc();
     }
 
-    private void FinishMove() throws GameActionException{
+    public void FinishMove() throws GameActionException{
         rc.move(current);
         UpdateAdjLoc();
     }
 
-    private void UpdateAdjLoc(){
+    public void UpdateAdjLoc(){
         int f = 128*(rc.getLocation().x%128) + (rc.getLocation().y%128);
         adjLoc = new MapLocation((f/128),(f%128));
     }
 
-    private void AlertOthers() throws GameActionException{
+    public void AlertOthers() throws GameActionException{
         int flag = (128*(goal.x % 128)) + (goal.y % 128);
         rc.setFlag(FlagHandle.SetLocFlagInt(flag,"20"));
     }
 
-    private void FindAdjustedPathToGoal() throws  GameActionException{
+    public void FindAdjustedPathToGoal() throws  GameActionException{
         current = Constants.AdjustLocation(rc.getLocation()).directionTo(goal);
         TryRandomMove();
     }
 
-    private void FindPathToGoal() throws GameActionException{
+    public void FindPathToGoal() throws GameActionException{
         current = rc.getLocation().directionTo(goal);
         TryRandomMove();
     }
 
 
-    private void TryRandomMove() throws GameActionException{
+    public void TryRandomMove() throws GameActionException{
         if(FindRandomMove()){
             FinishMove();
         }
     }
 
-    private boolean FindRandomMove() throws GameActionException {
+    public boolean FindRandomMove() throws GameActionException {
         if(!rc.canMove(current)){
             if(!rc.onTheMap(rc.getLocation().add(current))){
                 current = current.opposite();
@@ -111,7 +111,7 @@ public class Movement {
         return false;
     }
 
-    private boolean TrySetGoal() throws GameActionException{
+    public boolean TrySetGoal() throws GameActionException{
         if(rc.canGetFlag(EC)){
             int flag = rc.getFlag(EC);
             if(String.valueOf(flag).length() > 1 && String.valueOf(flag).substring(0,2).equals("30")){
@@ -132,5 +132,4 @@ public class Movement {
         }
         return false;
     }
-
 }

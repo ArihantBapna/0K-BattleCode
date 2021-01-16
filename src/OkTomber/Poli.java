@@ -20,7 +20,7 @@ public class Poli {
     public void TryGivingSpeech() throws GameActionException{
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attack = rc.senseNearbyRobots(actionRadius, enemy);
+        RobotInfo[] attack = rc.senseNearbyRobots(actionRadius-3, enemy);
         RobotInfo[] neut = rc.senseNearbyRobots(actionRadius, Team.NEUTRAL);
         if (attack.length != 0 && rc.canEmpower(actionRadius)) {
             rc.empower(actionRadius);

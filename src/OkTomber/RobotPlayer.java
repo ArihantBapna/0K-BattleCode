@@ -34,6 +34,7 @@ public class RobotPlayer {
                 turnCount++;
                 e.doRun();
                 Clock.yield();
+
             }
         } else if (type == RobotType.MUCKRAKER) {
             Muck e = new Muck(rc);

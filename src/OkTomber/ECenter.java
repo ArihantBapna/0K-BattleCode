@@ -7,12 +7,11 @@ import java.util.*;
 public class ECenter {
 
     public RobotController rc;
-    public int idEC = 0;
-    public MapLocation adjLoc;
     public ArrayList<Integer> robotId;
     public double infPR;
 
     private int modeEC;
+    private int probMode;
     private List<Double> probDist;
     private List<RobotType> robType;
     private ArrayList<Integer> stuckId;
@@ -22,62 +21,112 @@ public class ECenter {
         robotId = new ArrayList<>();
         stuckId = new ArrayList<>();
 
-        probDist = Arrays.asList(0.33,0.33,0.33);
+        probDist = Arrays.asList(0.45,0.45,0.1);
         robType = Arrays.asList(Constants.spawnableRobot);
         infPR = 0;
         modeEC = 0;
+        probMode = 0;
     }
 
     public void doRun() throws GameActionException {
-        boolean built = false;
 
-        infPR = Math.sqrt(RobotPlayer.turnCount) * 0.2;
+        if(RobotPlayer.turnCount % 2 != 0){
+            DoSpawns();
+        }
+        if(RobotPlayer.turnCount >= 300){
+            TryVote();
+        }
+        RunChecksums();
+    }
 
-        String flag = String.valueOf(rc.getFlag(rc.getID())).substring(0,1);
-        if(flag.equals("3")){
-            probDist = Arrays.asList(0.6,0.2,0.2);
+    private int ThreatAssess() throws GameActionException {
+        for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam().opponent())){
+            if(r.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
+                probDist = Arrays.asList(0.3,0.1,0.6);
+                probMode = 1;
+                return 50;
+            }
+        }
+        return 25;
+    }
+
+    private void TryVote() throws GameActionException {
+        int inf = rc.getInfluence();
+        int bid = (int) (0.3 * inf);
+        if(rc.canBid(bid)){
+            rc.bid(bid);
+        }
+    }
+
+    private void DoSpawns() throws GameActionException {
+        if(RobotPlayer.turnCount == 1 && rc.getInfluence() >= 25){
+            DoRandomSpawns(RobotType.POLITICIAN,ThreatAssess());
+        }else if(RobotPlayer.turnCount == 3 && rc.getInfluence() >= 107){
+            DoRandomSpawns(RobotType.SLANDERER,107);
+        }else if(RobotPlayer.turnCount == 5 && rc.getInfluence() >= 1){
+            DoRandomSpawns(RobotType.MUCKRAKER,1);
+        }else if(RobotPlayer.turnCount > 300){
+            probDist = Arrays.asList(0.56,0.34,0.1);
+            DoRandomSpawns(GetRandomRobot());
         }else{
-            probDist = Arrays.asList(0.5,0.2,0.3);
+            if(probMode == 1){
+                int con = 0;
+                for(RobotInfo r : rc.senseNearbyRobots(2,rc.getTeam().opponent())){
+                    con += r.getConviction();
+                }
+                if(rc.getInfluence() > con){
+                    DoRandomSpawns(RobotType.POLITICIAN,con);
+                }
+                else if(RobotPlayer.turnCount > 100){
+                    probDist = Arrays.asList(0.45,0.45,0.1);
+                }
+                else{
+                    return;
+                }
+            }
+            DoRandomSpawns(GetRandomRobot());
         }
-        RobotType toBuild = GetRandomRobot();
-        int influence = (int) Math.floor(0.8*infPR);
-        switch(toBuild){
-            case POLITICIAN:{
-                if(influence < 50) influence = 50;
-                break;
-            }
-            case SLANDERER:{
-                if(influence < 41) influence = 41;
-                break;
-            }
-            case MUCKRAKER:{
-                if(influence < 10) influence = 10;
-                break;
-            }
-        }
+    }
 
+
+    private void DoRandomSpawns(RobotType toBuild, int i) throws GameActionException{
         for (Direction dir : Constants.directions) {
-            if (rc.canBuildRobot(toBuild, dir, influence)) {
-                rc.buildRobot(toBuild, dir, influence);
+            if (rc.canBuildRobot(toBuild, dir, i)) {
+                rc.buildRobot(toBuild, dir, i);
                 RobotInfo r = rc.senseRobotAtLocation(rc.getLocation().add(dir));
                 int id = r.getID();
                 robotId.add(id);
-                built = true;
             }
         }
+    }
 
-        if(rc.getRoundNum() < 200){
-            if(rc.canBid((int) (rc.getInfluence()*0.2))){
-                rc.bid((int) (rc.getInfluence()*0.2));
+    private void DoRandomSpawns(RobotType toBuild) throws GameActionException{
+        int influence = rc.getInfluence();
+        int inf = 0;
+        switch(toBuild){
+            case POLITICIAN:{
+                if(influence < 100) inf = 1;
+                else inf = (int) (0.25*influence);
+                break;
             }
-        }else{
-            if(rc.canBid(2)){
-                rc.bid(2);
+            case SLANDERER:{
+                inf = (int) (0.7*influence);
+                break;
+            }
+            case MUCKRAKER:{
+                if(RobotPlayer.turnCount > 100) inf = (int) (0.3*influence);
+                else inf = 1;
+                break;
             }
         }
-
-
-        RunChecksums();
+        for (Direction dir : Constants.directions) {
+            if (rc.canBuildRobot(toBuild, dir, inf)) {
+                rc.buildRobot(toBuild, dir, inf);
+                RobotInfo r = rc.senseRobotAtLocation(rc.getLocation().add(dir));
+                int id = r.getID();
+                robotId.add(id);
+            }
+        }
     }
 
     private RobotType GetRandomRobot(){
@@ -111,6 +160,18 @@ public class ECenter {
                 }else{
                     CheckStuck();
                 }
+            }
+        }
+    }
+
+    private void DoVotes() throws GameActionException{
+        if(rc.getRoundNum() > 200){
+            if(rc.canBid((int) (rc.getInfluence()*0.2))){
+                rc.bid((int) (rc.getInfluence()*0.2));
+            }
+        }else{
+            if(rc.canBid(2)){
+                rc.bid(2);
             }
         }
     }

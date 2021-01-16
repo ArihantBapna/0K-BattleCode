@@ -5,18 +5,21 @@ import battlecode.common.*;
 public class Sland {
     RobotController rc;
 
-    public Movement mover;
+    public SlandMove mover;
+    public Movement move;
 
     public Sland(RobotController rc) throws GameActionException {
         this.rc = rc;
-        mover = new Movement(rc);
+        mover = new SlandMove(rc);
+        move = new Movement(rc);
     }
 
     public void doRun() throws GameActionException {
-        DoMovement();
+        if(rc.getType().equals(RobotType.SLANDERER)) DoMovement();
+        else move.DoMove();
     }
 
     public void DoMovement() throws GameActionException{
-        mover.DoMove();
+        mover.DoSlandMove();
     }
 }

@@ -1,7 +1,6 @@
 package OkTomber;
 
-import battlecode.common.MapLocation;
-import javafx.util.Pair;
+import battlecode.common.*;
 
 public class FlagHandle {
 
