@@ -2,8 +2,6 @@ package OkZoomer;
 
 import battlecode.common.*;
 
-import java.util.Objects;
-
 public class Movement {
     public RobotController rc;
     public Direction current;

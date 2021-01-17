@@ -2,10 +2,7 @@ package OkZoomer;
 
 import battlecode.common.*;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class ECenterSpawns {
 

@@ -1,6 +1,5 @@
 package OkZoomer;
 
-import OkTomber.Constants;
 import battlecode.common.*;
 
 import java.util.ArrayList;

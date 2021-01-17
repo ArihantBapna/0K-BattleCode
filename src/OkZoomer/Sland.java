@@ -5,7 +5,6 @@ import battlecode.common.*;
 public class Sland {
 
     public SlandMove move;
-    public PoliMove moveNew;
     public RobotController rc;
 
     public int currentType;

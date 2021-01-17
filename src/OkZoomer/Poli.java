@@ -1,7 +1,6 @@
 package OkZoomer;
 
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 public class Poli {
 

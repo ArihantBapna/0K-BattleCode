@@ -3,7 +3,6 @@ package OkZoomer;
 import battlecode.common.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class ECenter {
 

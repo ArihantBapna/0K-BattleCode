@@ -1,9 +1,6 @@
 package OkZoomer;
 
-import battlecode.common.Clock;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 
 public class RobotPlayer {
     static RobotController rc;
