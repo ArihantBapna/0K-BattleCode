@@ -49,6 +49,16 @@ public class Movement {
                     FindPathToGoal();
                     AlertOthers();
                 }
+            }else{
+                TryConvert();
+            }
+        }
+    }
+
+    private void TryConvert() throws GameActionException {
+        if(rc.getType().equals(RobotType.POLITICIAN)){
+            if(rc.getInfluence() > 10){
+                rc.empower(1);
             }
         }
     }
