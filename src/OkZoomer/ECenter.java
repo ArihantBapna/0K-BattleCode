@@ -32,8 +32,10 @@ public class ECenter {
     public void doRun() throws GameActionException {
         if(rc.getRoundNum() < 6){
             spawn.ReallyEarlySpawns(rc.getRoundNum());
-        }else{
+        }else if(rc.getRoundNum() < 500){
             spawn.EarlySpawns();
+        }else{
+            spawn.MidGameSpawns();
         }
     }
 

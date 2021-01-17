@@ -46,10 +46,25 @@ public class ECenterSpawns {
     public void EarlySpawns() throws GameActionException{
         probDist = Arrays.asList(0.45,0.45,0.1);
         RemoveConvertedSland();
-        if(ECenter.sland.size() > 18){
+        if(ECenter.sland.size() > 20){
             probDist = Arrays.asList(0.45,0.1,0.45);
         }
         DoRandomSpawns(GetRandomRobot());
+    }
+
+    public void MidGameSpawns() throws GameActionException{
+        probDist = Arrays.asList(0.56,0.2,0.24);
+        RemoveConvertedSland();
+        DoRandomSpawns(GetRandomRobot());
+        TryVote();
+    }
+
+    public void TryVote() throws GameActionException {
+        int inf = rc.getInfluence();
+        int bid = (int) (0.3 * inf);
+        if(rc.canBid(bid)){
+            rc.bid(bid);
+        }
     }
 
     public void RemoveConvertedSland() throws GameActionException{
