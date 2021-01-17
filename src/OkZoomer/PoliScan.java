@@ -40,7 +40,7 @@ public class PoliScan {
         nearbyMucks = new ArrayList<>();
         RobotInfo m = null;
         for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam().opponent())){
-            if(r.getType().equals(RobotType.MUCKRAKER) || r.getType().equals(RobotType.ENLIGHTENMENT_CENTER) || r.getType().equals(RobotType.POLITICIAN)){
+            if(r.getType().equals(RobotType.MUCKRAKER) || r.getType().equals(RobotType.ENLIGHTENMENT_CENTER)){
                 nearbyMucks.add(r);
                 //Getting the closest enemy robotinfo
                 if(Objects.isNull(m)){
