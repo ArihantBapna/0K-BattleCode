@@ -97,7 +97,7 @@ public class ECenterSpawns {
                 break;
             }
         }
-        for (Direction dir : OkTomber.Constants.directions) {
+        for (Direction dir : Constants.directions) {
             if (rc.canBuildRobot(toBuild, dir, inf)) {
                 rc.buildRobot(toBuild, dir, inf);
                 RobotInfo r = rc.senseRobotAtLocation(rc.getLocation().add(dir));
@@ -147,7 +147,7 @@ public class ECenterSpawns {
     }
 
     private static RobotType randomSpawnableRobotType() {
-        return OkTomber.Constants.spawnableRobot[(int) (Math.random() *  OkTomber.Constants.spawnableRobot.length)];
+        return Constants.spawnableRobot[(int) (Math.random() *  Constants.spawnableRobot.length)];
     }
 
 
