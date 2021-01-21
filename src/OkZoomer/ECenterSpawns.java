@@ -43,9 +43,6 @@ public class ECenterSpawns {
     public void EarlySpawns() throws GameActionException{
         probDist = Arrays.asList(0.45,0.45,0.1);
         RemoveConvertedSland();
-        if(ECenter.sland.size() > 20){
-            probDist = Arrays.asList(0.45,0.1,0.45);
-        }
         DoRandomSpawns(GetRandomRobot());
     }
 

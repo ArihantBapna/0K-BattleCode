@@ -15,6 +15,12 @@ public class SlandMove extends Movement {
     }
 
     public void DoMove() throws GameActionException {
+        if(dis < 100){
+            if(rc.getRoundNum() > 100){
+                dis = 101;
+            }
+        }
+
         CheckSurroundingsAndMove();
     }
 
@@ -22,10 +28,8 @@ public class SlandMove extends Movement {
         if(scan.GetNearbyEnemy()>0){
             TryAndConvert();
             current = rc.getLocation().directionTo(scan.closest.getLocation());
-            TryRandomMove();
-        }else{
-            TryRandomMove();
         }
+        TryRandomMove();
 
     }
 
