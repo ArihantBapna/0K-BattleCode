@@ -14,6 +14,8 @@ public class Movement {
     public Scan scan;
     public Communication comm;
 
+
+
     public Movement(RobotController r) throws GameActionException {
         rc = r;
         scan = new Scan(rc);
