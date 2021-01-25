@@ -41,12 +41,14 @@ public class Constants {
 
     public static int EncodeLocation(MapLocation uAdj,String head){
         int val = 128*(uAdj.x%128) + (uAdj.y%128);
-        val = Integer.parseInt(head + String.valueOf(val));
+        val = Integer.parseInt(head + val);
         return val;
     }
 
     public static MapLocation DecodeLocation(int flag){
-        int val = Integer.parseInt(String.valueOf(flag).substring(1));
+        String val1 = String.valueOf(flag);
+        val1 = val1.substring(1,val1.length()-1);
+        int val = Integer.parseInt(val1);
         return new MapLocation((val/128),(val%128));
     }
 }

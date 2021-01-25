@@ -59,6 +59,25 @@ public class PoliScan {
         return flag;
     }
 
+    public MapLocation SetNearbyMuckFlag() throws GameActionException{
+        nearbyMucks = new ArrayList<>();
+        RobotInfo m = null;
+        MapLocation nearby = null;
+        for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam().opponent())){
+            if(r.getType().equals(RobotType.MUCKRAKER)){
+                if(Objects.isNull(m)){
+                    m = r;
+                }else{
+                    if(m.getLocation().distanceSquaredTo(rc.getLocation()) > r.getLocation().distanceSquaredTo(rc.getLocation())){
+                        m = r;
+                        nearby = r.getLocation();
+                    }
+                }
+            }
+        }
+        return nearby;
+    }
+
     public int GetNearbyEnemies(){
         nearbyMucks = new ArrayList<>();
         RobotInfo m = null;

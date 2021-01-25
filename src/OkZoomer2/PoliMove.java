@@ -1,6 +1,7 @@
 package OkZoomer2;
 
 import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 
 import java.util.Objects;
@@ -25,11 +26,16 @@ public class PoliMove extends Movement {
                     OptimizeDirection(current);
                 }
             }else{
+                if(!Objects.isNull(scan.SetNearbyMuckFlag())){
+                    MapLocation u = scan.SetNearbyMuckFlag();
+                    rc.setFlag(Constants.EncodeLocation(u,"2"));
+                }
                 if(!Objects.isNull(mlEC)){
                     DefensiveRotation();
                 }else{
                     OptimizeDirection(current);
                 }
+
             }
         }else{
             if(scan.GetNearbyEnemies() > 0){
@@ -39,7 +45,12 @@ public class PoliMove extends Movement {
                 TryAndConvert();
                 current = rc.getLocation().directionTo(scan.closest.getLocation());
             }else{
-                CheckAllPaths(rc.getLocation());
+                int flag = scan.GetNearbyFlag();
+                if(flag != 0){
+                    current = Constants.AdjustLocation(rc.getLocation()).directionTo(Constants.DecodeLocation(flag));
+                }else{
+                    CheckAllPaths(rc.getLocation());
+                }
             }
             OptimizeDirection(current);
         }

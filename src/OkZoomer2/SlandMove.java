@@ -30,7 +30,7 @@ public class SlandMove extends Movement {
             TryAndConvert();
             current = rc.getLocation().directionTo(scan.closest.getLocation());
         }
-        TryRandomMove();
+        OptimizeDirection(current);
 
     }
 
@@ -48,6 +48,12 @@ public class SlandMove extends Movement {
         if(scan.GetNearbyMucks() != 0){
             current = scan.avoid;
         }else{
+            /*
+            int flag = scan.ScanNearbyPoliFlag();
+            if(flag != 0){
+                current = Constants.DecodeLocation(flag).directionTo(Constants.AdjustLocation(rc.getLocation()));
+            }
+            */
             if(rc.getLocation().isWithinDistanceSquared(mlEC,dis)){
                 if(rc.getLocation().isWithinDistanceSquared(mlEC,4)){
                     current = rc.getLocation().directionTo(mlEC).opposite();
@@ -58,6 +64,6 @@ public class SlandMove extends Movement {
                 current = rc.getLocation().directionTo(mlEC);
             }
         }
-        TryRandomMove();
+        OptimizeDirection(current);
     }
 }

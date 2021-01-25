@@ -88,7 +88,15 @@ public class ECenterSpawns {
                 break;
             }
             case SLANDERER:{
-                inf = (int) (0.86*influence);
+                if(RobotPlayer.turnCount < 200){
+                    inf = (int) (0.86 * influence);
+                }else{
+                    if(rc.getInfluence() > 1000){
+                        inf = 949;
+                    }else{
+                        inf = (int) (0.5 * influence);
+                    }
+                }
                 break;
             }
             case MUCKRAKER:{

@@ -120,6 +120,7 @@ public class Movement {
                 }else{
                     e.setValue(e.getValue() - 10);
                 }
+                //m = m.add(dir);
             }
         }
         LinkedHashMap<Direction, Double> reverseSortedMap = new LinkedHashMap<>();

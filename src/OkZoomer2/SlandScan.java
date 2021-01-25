@@ -1,9 +1,6 @@
 package OkZoomer2;
 
-import battlecode.common.Direction;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -18,6 +15,29 @@ public class SlandScan {
         rc = r;
         avoid = Constants.randomDirection();
         nearbyMucks = new ArrayList<>();
+    }
+
+    public int ScanNearbyPoliFlag() throws GameActionException{
+        RobotInfo m = null;
+        int flag = 0;
+        for(RobotInfo r : rc.senseNearbyRobots(-1,rc.getTeam())){
+            if(r.getType().equals(RobotType.POLITICIAN)){
+                if(Objects.isNull(m)){
+                    m = r;
+                    flag = rc.getFlag(r.getID());
+                }else{
+                    if(m.getLocation().distanceSquaredTo(rc.getLocation()) > r.getLocation().distanceSquaredTo(rc.getLocation())){
+                        if(rc.canGetFlag(m.getID())){
+                            if(rc.getFlag(m.getID()) != 0){
+                                m = r;
+                                flag = rc.getFlag(m.getID());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return flag;
     }
 
     public int GetNearbyMucks(){

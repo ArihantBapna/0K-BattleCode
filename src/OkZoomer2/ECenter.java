@@ -37,6 +37,7 @@ public class ECenter {
         }else{
             spawn.MidGameSpawns();
         }
+        comm.GetECFlag();
     }
 
 
