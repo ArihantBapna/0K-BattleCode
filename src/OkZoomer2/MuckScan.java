@@ -37,13 +37,16 @@ public class MuckScan {
                 if(rc.isLocationOccupied(rLoc.add(d))){
                     RobotInfo ap = rc.senseRobotAtLocation(rLoc.add(d));
                     if(!ap.getTeam().equals(rc.getTeam())){
+                        System.out.println("EC Surround is false");
                         return false;
                     }
                 }else{
+                    System.out.println("EC Surround is false");
                     return false;
                 }
             }
         }
+        System.out.println("EC Surround is true");
         return true;
     }
 

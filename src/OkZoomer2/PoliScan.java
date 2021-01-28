@@ -82,9 +82,11 @@ public class PoliScan {
 
     public boolean GetNearbyNeutEC(){
         int count  = 0 ;
-        for(RobotInfo r : rc.senseNearbyRobots(-1,Team.NEUTRAL)){
-            closest = r;
-            count++;
+        for(RobotInfo r : rc.senseNearbyRobots(-1)){
+            if(r.getType().equals(RobotType.ENLIGHTENMENT_CENTER) && r.getTeam().equals(Team.NEUTRAL)){
+                closest = r;
+                count++;
+            }
         }
         return count > 0;
     }
