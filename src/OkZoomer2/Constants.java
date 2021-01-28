@@ -45,13 +45,6 @@ public class Constants {
         return val;
     }
 
-    public static MapLocation ReadEncodedFlag(int val){
-        String v = String.valueOf(val);
-        v = v.substring(1);
-        int flag = Integer.parseInt(v);
-        return new MapLocation((flag/128),(flag%128));
-    }
-
     public static MapLocation DecodeLocation(int flag){
         int val = Integer.parseInt(String.valueOf(flag).substring(1));
         return new MapLocation((val/128),(val%128));

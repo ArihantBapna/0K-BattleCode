@@ -2,8 +2,6 @@ package OkZoomer2;
 
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.Team;
 
 import java.util.Objects;
 
@@ -24,7 +22,7 @@ public class PoliMove extends Movement {
                 TryAndSubdue();
                 if(!rc.getLocation().isAdjacentTo(scan.closest.getLocation())){
                     current = rc.getLocation().directionTo(scan.closest.getLocation());
-                    TryRandomMove();
+                    OptimizeDirection(current);
                 }
             }else{
                 if(!Objects.isNull(mlEC)){
@@ -34,51 +32,34 @@ public class PoliMove extends Movement {
                 }
             }
         }else{
-            TryGivingSpeech();
             if(scan.GetNearbyEnemies() > 0){
                 TryAndSubdue();
                 current = rc.getLocation().directionTo(scan.closest.getLocation());
-                TryRandomMove();
             }else if(scan.GetNearbyNeutEC()){
-                TryGivingSpeech();
+                TryAndConvert();
                 current = rc.getLocation().directionTo(scan.closest.getLocation());
-                TryRandomMove();
-                System.out.println("Current: " +current);
             }else{
                 CheckAllPaths(rc.getLocation());
-                OptimizeDirection(current);
             }
-
-        }
-    }
-
-    public void TryGivingSpeech() throws GameActionException{
-        Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attack = rc.senseNearbyRobots(actionRadius, enemy);
-        RobotInfo[] neut = rc.senseNearbyRobots(actionRadius, Team.NEUTRAL);
-        if (attack.length != 0 && rc.canEmpower(actionRadius)) {
-            rc.empower(actionRadius);
-        }else if(neut.length != 0 && rc.canEmpower(actionRadius)){
-            rc.empower(actionRadius);
+            OptimizeDirection(current);
         }
     }
 
     public void TryAndConvert() throws GameActionException{
-        if(scan.closest.getLocation().isWithinDistanceSquared(rc.getLocation(),rc.getType().actionRadiusSquared)){
-            if(rc.canEmpower(rc.getType().actionRadiusSquared)){
+        if(scan.closest.getLocation().isWithinDistanceSquared(rc.getLocation(),rc.getType().actionRadiusSquared-1)){
+            if(rc.canEmpower(rc.getType().actionRadiusSquared-1)){
                 if(rc.getInfluence() != 1){
-                    rc.empower(rc.getType().actionRadiusSquared);
+                    rc.empower(rc.getType().actionRadiusSquared-1);
                 }
             }
         }
     }
 
     public void TryAndSubdue() throws GameActionException{
-        if(scan.closest.getLocation().isWithinDistanceSquared(rc.getLocation(),rc.getType().actionRadiusSquared)){
-            if(rc.canEmpower(rc.getType().actionRadiusSquared)){
+        if(scan.closest.getLocation().isWithinDistanceSquared(rc.getLocation(),rc.getType().actionRadiusSquared-4)){
+            if(rc.canEmpower(rc.getType().actionRadiusSquared-4)){
                 if(rc.getInfluence() != 1){
-                    rc.empower(rc.getType().actionRadiusSquared);
+                    rc.empower(rc.getType().actionRadiusSquared-4);
                 }
             }
         }

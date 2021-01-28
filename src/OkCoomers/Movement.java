@@ -1,6 +1,7 @@
 package OkCoomers;
 
 import battlecode.common.*;
+import scala.util.Try;
 
 public class Movement {
 

@@ -44,13 +44,13 @@ public class ECenterSpawns {
     }
 
     public void EarlySpawns() throws GameActionException{
-        probDist = Arrays.asList(0.25,0.25,0.5);
+        probDist = Arrays.asList(0.45,0.25,0.3);
         RemoveConvertedSland();
         DoRandomSpawns(GetRandomRobot());
-        TryVote();
     }
 
     public void MidGameSpawns() throws GameActionException{
+        probDist = Arrays.asList(0.56,0.2,0.24);
         RemoveConvertedSland();
         DoRandomSpawns(GetRandomRobot());
         TryVote();
@@ -60,11 +60,7 @@ public class ECenterSpawns {
         int inf = rc.getInfluence();
         int bid = (int) (0.3 * inf);
         if(rc.canBid(bid)){
-            if(rc.getRoundNum()<300){
-                rc.bid(2);
-            }else{
-                rc.bid(bid);
-            }
+            rc.bid(bid);
         }
     }
 
@@ -88,7 +84,7 @@ public class ECenterSpawns {
         switch(toBuild){
             case POLITICIAN:{
                 if(influence < 100) inf = 1;
-                else inf = (int) (0.2*influence);
+                else inf = (int) (0.25*influence);
                 break;
             }
             case SLANDERER:{
